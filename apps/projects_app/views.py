@@ -10,8 +10,10 @@ from rest_framework.views import APIView
 from apps.projects_app.models import project
 from apps.projects_app.serializers import ProjectSerializer, SelectProjectsSerializer
 from apps.task_section_app.serializers import SectionSerializer
+from apps.tickets_app.models import Ticket
 from apps.tickets_app.serializers import TicketSerializer
 from apps.users_app.models import User
+from tm_django.filters_override import FilterProject
 
 
 class CreatePojectView(APIView):
@@ -32,7 +34,7 @@ class CreatePojectView(APIView):
 
             section_serializer = SectionSerializer(data=section_data, many=True)
             if section_serializer.is_valid(raise_exception=True):
-                 section_serializer.save()
+                section_serializer.save()
 
         if task_data:
             task_data = self.add_porject_id(task_data, project_id)
@@ -49,11 +51,10 @@ class CreatePojectView(APIView):
             'project': projectSerializer.data
         })
 
-
     def add_porject_id(self, data, project_id):
         for item in data:
             item['project'] = project_id
-        return  data
+        return data
 
     def add_user_id(self, data, user_id):
         for item in data:
@@ -93,16 +94,19 @@ class UpdateProjectView(UpdateAPIView):
     queryset = project.objects.all()
     serializer_class = ProjectSerializer
 
-class  SelectProjectListView(ListAPIView):
+
+class SelectProjectListView(ListAPIView):
     # lookup_field = 'creator'
     queryset = project.objects.all()
     # permission_classes = [IsAuthenticated]
     serializer_class = SelectProjectsSerializer
+
     def get_queryset(self):
 
-        queryset = project.objects.filter(Q(creator=self.kwargs['user_id'])|
-                                          Q(members__id=self.kwargs['user_id'])
-                                          )
+        queryset = project.objects.filter(
+            Q(creator=self.request.user.id) |
+            Q(members__id=self.request.user.id)
+        )
         return set(queryset)
 
 
@@ -111,5 +115,25 @@ class GetProjectView(RetrieveAPIView):
     serializer_class = SelectProjectsSerializer
 
     def get_queryset(self):
-        return project.objects.filter(id=self.kwargs['pk'])
+        projects = project.objects.filter(id=self.kwargs['pk'])
+        return projects
+
+
+class ProjectSearchListView(ListAPIView):
+    queryset = project.objects.all()
+    serializer_class = ProjectSerializer
+    filter_backends = [FilterProject]
+    search_fields = ['title']
+    lookup_field = ['user_id']
+
+
+class GetTaskProjects(ListAPIView):
+    queryset = project.objects.all()
+    serializer_class = ProjectSerializer
+    lookup_field = ['ticket_id']
+
+    def get_queryset(self):
+        projects = project.objects.filter(project_tickets=self.kwargs['ticket_id'])
+        return projects
+
 

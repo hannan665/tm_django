@@ -150,6 +150,9 @@ class User(AbstractUser):
     def uuid(self):
         return str(self.id)
 
+    @property
+    def project_set(self):
+        return self.project_set.all()
 
     # def create_superuser(self, email, name, password=None, **extra_fields):
     #     if not email:

@@ -7,16 +7,20 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+from rest_framework import filters
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.generics import UpdateAPIView
+from rest_framework.generics import UpdateAPIView, RetrieveAPIView, ListAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.reverse import reverse, reverse_lazy
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from apps.users_app.models import User
-from apps.users_app.serializers import UserSerializer, UserUpdateSerializer, MyTokenObtainPairSerializer
+from apps.users_app.models import User, UserProfile
+from apps.users_app.serializers import UserSerializer, UserUpdateSerializer, MyTokenObtainPairSerializer, \
+    UserProfileSerializer, UserMainSerializer
+from tm_django.filters_override import FilterMemberOfProject
 
 
 class MyObtainTokenPairView(TokenObtainPairView):
@@ -61,6 +65,7 @@ class Register(APIView):
 
 
 class LoginViewCookie(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         email = request.data.get('email', None)
         password = request.data.get('password', None)
@@ -131,3 +136,34 @@ class UserUpdate(APIView):
         return Response({
            'user_updated':True
         })
+
+class GetUserView(RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserMainSerializer
+
+
+    def get_queryset(self):
+        return User.objects.filter(id=self.kwargs['pk'])
+
+
+class UserListView(ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserMainSerializer
+    filter_backends = [FilterMemberOfProject]
+    search_fields = ['name', 'email', 'profile__name']
+    lookup_field = ['project_id']
+
+    # def filter_queryset(self, queryset):
+    #     """
+    #     Given a queryset, filter it with whichever filter backend is in use.
+    #     You are unlikely to want to override this method, although you may need
+    #     to call it either from a list view, or from a custom `get_object`
+    #     method if you want to apply the configured filtering backend to the
+    #     default queryset.
+    #     """
+    #     for backend in list(self.filter_backends):
+    #         queryset = backend().filter_queryset(self.request, queryset, self)
+    #     return queryset
+
+    # def get_queryset(self):
+    #     return User.objects.filter(id=self.kwargs['pk'])

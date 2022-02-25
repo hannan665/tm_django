@@ -14,11 +14,14 @@ class Ticket(models.Model):
                                    related_name="creatde_by")
     assignee = models.ForeignKey('users_app.User', on_delete=models.CASCADE, blank=True, null=True,
                                  related_name="assigned_to")
-    project = models.ForeignKey('projects_app.project', on_delete=models.CASCADE, blank=True, null=True)
+    project = models.ForeignKey('projects_app.project', on_delete=models.CASCADE, blank=True, null=True,
+                                related_name="project")
+    projects = models.ManyToManyField('projects_app.project', blank=True, related_name="project_tickets")
     description = models.TextField(_("Description"), blank=True, null=True)
     question_or_update = models.TextField(_("Question or Updates"), blank=True, null=True)
     is_completed = models.BooleanField(default=False, blank=True, null=True)
     section = models.ForeignKey('task_section_app.Section', on_delete=models.CASCADE, blank=True, null=True)
+    sections = models.ManyToManyField('task_section_app.Section', blank=True, related_name="section_tickets")
 
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated at"), auto_now=True)
@@ -31,6 +34,7 @@ class Ticket(models.Model):
     @property
     def uuid(self):
         return str(self.id)
+
 
 
 class ExtraField(models.Model):

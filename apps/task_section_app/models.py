@@ -4,6 +4,8 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 # Create your models here.
+from apps.tickets_app.models import Ticket
+
 
 class Section(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -18,5 +20,4 @@ class Section(models.Model):
         if self.title == None:
             return " title IS NULL"
         return self.title
-
 

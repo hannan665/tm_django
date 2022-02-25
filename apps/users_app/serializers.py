@@ -54,10 +54,11 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
 class NestedUserSerializer(serializers.ModelSerializer):
     email = serializers.CharField(required=False)
+    name = serializers.CharField(required=False)
 
     class Meta:
         model = User
-        fields = ["email"]
+        fields = ["email", "name"]
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
@@ -70,3 +71,9 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add custom claims
         token['email'] = user.email
         return token
+
+class UserMainSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer(required=False)
+    class Meta:
+        model = User
+        fields = ('id','email','name', "profile",'is_admin')
