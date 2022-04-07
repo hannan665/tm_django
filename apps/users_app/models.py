@@ -40,6 +40,8 @@ class UserProfile(models.Model):
     )
     bio = models.TextField(_("Bio"), max_length=250, blank=True, default='')
     team_count = models.PositiveIntegerField(_("Follower count"), null=False, default='0')
+    faviroute_projects = models.ManyToManyField('projects_app.project', blank=True, related_name='faviroute_projects')
+
     # slug = AutoSlugField(null=True, unique=True, default=None, populate_from=lambda instance: instance.name if instance.name else instance.userprofile.email.split("@")[0], always_update=True)
     # slug = AutoSlugField(null=True, unique=True, default=None, populate_from=populate_userslug, always_update=True)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)

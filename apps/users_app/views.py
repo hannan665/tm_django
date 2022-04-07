@@ -167,3 +167,13 @@ class UserListView(ListAPIView):
 
     # def get_queryset(self):
     #     return User.objects.filter(id=self.kwargs['pk'])
+
+
+
+class UpdateUserProfile(UpdateAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+    lookup_field = 'id'
+
+    # def get_queryset(self):
+    #     return UserProfile.objects.filter(id=self.kwargs['profile_id'])

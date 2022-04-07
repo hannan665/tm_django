@@ -29,11 +29,14 @@ class Ticket(models.Model):
     def __str__(self):
         if self.title == None:
             return " title IS NULL"
-        return self.title
+            return self.title
 
     @property
     def uuid(self):
         return str(self.id)
+
+
+
 
 
 

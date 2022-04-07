@@ -6,7 +6,7 @@ from apps.task_section_app.models import Section
 from apps.task_section_app.serializers import SectionSerializer
 from apps.tickets_app.serializers import TicketSerializer
 from apps.users_app.models import User
-from apps.users_app.serializers import UserSerializer, NestedUserSerializer, UserMainSerializer
+from apps.users_app.serializers import UserSerializer, NestedUserSerializer, UserMainSerializer, UserProfileSerializer
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -56,10 +56,11 @@ class SelectProjectsSerializer(serializers.ModelSerializer):
     members = UserSerializer( required=False, many=True)
     sections = SectionSerializer(many=True, required=False,read_only=False)
     project_tickets = TicketSerializer(required=False, many=True, read_only=False)
+    # faviroute_projects = UserProfileSerializer(required=False, read_only=False, many=True)
 
 
     class Meta:
         model = project
         # fields = ["members"]
-        fields = ["id","title","creator","members","description", "type", 'color',"sections", 'project_tickets']
+        fields = ["id","title","creator","members","description", "type", 'color',"sections", 'project_tickets','faviroute_projects']
         extra_kwargs = {'members': {'required': False}}

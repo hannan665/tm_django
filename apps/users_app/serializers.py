@@ -4,19 +4,20 @@ from apps.users_app.models import User, UserProfile
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    # profile = Pr
     class Meta:
         model = UserProfile
         fields = "__all__"
 
-    # def create(self, validated_data):
-    #     password = validated_data.pop('password', None)
-    #     instancce = self.Meta.model(**validated_data)
-    #
-    #     if password is not None:
-    #         instancce.set_password(password)
-    #     instancce.save()
-    #     return instancce
+    def update(self,instance, validated_data):
+        faviroute_projects = self.validated_data.get('faviroute_projects', None)
+        if faviroute_projects:
+            if instance.faviroute_projects.filter(id=faviroute_projects[0].id):
+                instance.faviroute_projects.remove(faviroute_projects[0].id)
+            else:
+                instance.faviroute_projects.add(faviroute_projects[0].id)
+        instance.save()
+        return instance
+
 
 class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(required=False)

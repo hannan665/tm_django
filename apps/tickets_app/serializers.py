@@ -16,7 +16,7 @@ class ExtraFieldSerializer(serializers.ModelSerializer):
     options = ExtraFieldOptionSerializer(required=False, many=True, read_only=False)
     class Meta:
         model = ExtraField
-        fields = ['id', 'title', 'value', 'type', 'description','color', 'options','field_option_id']
+        fields = ['id', 'title', 'value', 'type', 'description','color', 'options','field_option_id', 'ticket']
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -52,8 +52,8 @@ class TicketSerializer(serializers.ModelSerializer):
                     else:
                         section = Section.objects.create(title='', project_id=projects[0])
                         project_sections_id = section.id
-
-                    instance.sections.remove(sections[1])
+                    if instance.sections.filter(id=sections[0]):
+                        instance.sections.remove(sections[1])
                     instance.sections.add(str(project_sections_id))
                 except Exception as e:
                     print('email does not exist')
